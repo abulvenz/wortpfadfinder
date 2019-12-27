@@ -1,6 +1,5 @@
 import m from 'mithril';
 import { h1, div, button } from './tags';
-
 const { trunc, random, round } = Math;
 
 /**
@@ -10,6 +9,7 @@ const { trunc, random, round } = Math;
  * - 5 -
  */
 const dices = [
+    // 0    1    2    3    4    5
     ['A', 'I', 'E', 'A', 'O', 'T'],
     ['S', 'E', 'R', 'A', 'C', 'L'],
     ['E', 'P', 'S', 'L', 'U', 'T'],
@@ -33,7 +33,6 @@ const dices = [
 
 const randomIdx = N => trunc(random() * N);
 const chooseSide = dice => dice[randomIdx(dice.length)];
-
 const range = N => {
     const result = [];
     for (let i = 0; i < N; i++) {
@@ -41,7 +40,6 @@ const range = N => {
     }
     return result;
 };
-
 const shuffle = arr => {
     const result = [];
     while (arr.length > 0) {
@@ -53,21 +51,23 @@ const shuffle = arr => {
 
 let cThrow = [];
 let solution = [];
-
 let timeOut = 1;
+let tHandle = null;
 
-const newGame = () => {
-    cThrow = shuffle(dices.map(chooseSide));
-    solution = [];
-
-    setTimeout(
+const startTimer = () => {
+    if (tHandle) clearTimeout(tHandle);
+    tHandle = setTimeout(
         () => {
             solution = cThrow.map(e => e);
             cThrow = [];
             m.redraw();
         }, timeOut * 60000);
-}
-
+};
+const newGame = () => {
+    cThrow = shuffle(dices.map(chooseSide));
+    solution = [];
+    startTimer();
+};
 const increaseTimeout = () => {
     timeOut += .5;
     timeOut %= 5;
@@ -79,21 +79,11 @@ m.mount(document.body, {
         h1('Wortpfadfinder'),
         div.wrapper(
             range(4).map(i =>
-                range(4).map(j =>
-                    div.box(
-                        cThrow[i * 4 + j]
-                    )
-                )
+                range(4).map(j => div.box(cThrow[i * 4 + j]))
             )
         ),
-        button({
-            onclick: e => {
-                cThrow = solution
-            }
-        }, 'Lösung'),
-        button({
-            onclick: newGame
-        }, 'Neu'),
+        button({ disabled: solution.length === 0, onclick: e => cThrow = solution }, 'Lösung'),
+        button({ onclick: newGame }, 'Neu'),
         button({ onclick: increaseTimeout }, 'Zeit: ' + timeOut + ' min')
     ])
 });
