@@ -1,7 +1,7 @@
     @import 'normalize.css';
     .wrapper {
         display: grid;
-        grid-template-columns: 60px 60px 60px 60px;
+        grid-template-columns: 80px 80px 80px 80px;
         grid-gap: 5px;
         background-color: #fff;
         color: #444;
@@ -13,11 +13,11 @@
         color: #fff;
         border-radius: 5px;
         padding: 0px 10px;
-        height: 60px;
-        font-size: 50px;
+        height: 80px;
+        font-size: 70px;
     }
     
     .container {
         margin: 0 auto;
-        max-width: 350px;
+        max-width: 450px;
     }

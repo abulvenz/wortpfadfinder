@@ -1,5 +1,6 @@
 import m from 'mithril';
 import { h1, div, button } from './tags';
+import help from './help';
 const { trunc, random, round } = Math;
 
 /**
@@ -84,6 +85,7 @@ m.mount(document.body, {
         ),
         button({ disabled: solution.length === 0, onclick: e => cThrow = solution }, 'Lösung'),
         button({ onclick: newGame }, 'Neu'),
-        button({ onclick: increaseTimeout }, 'Zeit: ' + timeOut + ' min')
+        button({ onclick: increaseTimeout }, 'Zeit: ' + timeOut + ' min'),
+        m(help)
     ])
 });
