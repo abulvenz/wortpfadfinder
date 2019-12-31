@@ -3,6 +3,8 @@ import { h1, div, button } from './tags';
 import help from './help';
 const { trunc, random, round } = Math;
 
+import k from './manifest.json';
+
 /**
  * - 0 -
  * 1 2 3
