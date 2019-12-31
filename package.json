@@ -3,7 +3,8 @@
         "mini.css": "^3.0.1",
         "mithril": "^2.0.4",
         "normalize.css": "^8.0.1",
-        "tagl-mithril": "^1.2.2"
+        "tagl-mithril": "^1.2.2",
+        "typo-js": "^1.1.0"
     },
     "devDependencies": {
         "cssnano": "^4.1.10"

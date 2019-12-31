@@ -1,7 +1,8 @@
 import m from 'mithril';
-import { h1, div, button } from './tags';
+import { h1, div, button, ul, li } from './tags';
 import help from './help';
 const { trunc, random, round } = Math;
+import solver from './solver';
 
 /**
  * - 0 -
@@ -54,6 +55,8 @@ let cThrow = [];
 let solution = [];
 let timeOut = 1;
 let tHandle = null;
+let words = [];
+
 
 const startTimer = () => {
     if (tHandle) clearTimeout(tHandle);
@@ -75,6 +78,8 @@ const increaseTimeout = () => {
     timeOut += timeOut === 0 ? 1 : 0
 };
 
+let showSolver = false;
+
 m.mount(document.body, {
     view: vnode => div.container([
         h1('Wortpfadfinder'),
@@ -86,6 +91,12 @@ m.mount(document.body, {
         button({ disabled: solution.length === 0, onclick: e => cThrow = solution }, 'Lösung'),
         button({ onclick: newGame }, 'Neu'),
         button({ onclick: increaseTimeout }, 'Zeit: ' + timeOut + ' min'),
-        m(help)
+        m(help),
+        showSolver ? [button({ disabled: !solver.ready(), onclick: e => words = solver.solve(cThrow) },
+                'Brute-force Angriff'
+            ),
+            ul(words.map(word => li(word))),
+        ] : null,
+        div.h5p.w100p({ onclick: e => showSolver = !showSolver }, m.trust('&nbsp;'))
     ])
 })

@@ -21,3 +21,12 @@
         margin: 0 auto;
         max-width: 450px;
     }
+    
+    .h5p {
+        height: 5%;
+    }
+    
+    .w100p {
+        width: 100%;
+        border: 1 px solid red;
+    }
