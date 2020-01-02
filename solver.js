@@ -1,18 +1,14 @@
 import m from 'mithril';
 import Typo from 'typo-js';
-//import dictionary from 'dictionary-de';
 
 const { sqrt, trunc, min, max } = Math;
 
-import aff from './de-DE.aff';
-import dic from './de-DE.dic';
-
-console.log(aff, dic)
+import aff from './de-DE/de-DE.aff';
+import dic from './de-DE/de-DE.dic';
 
 let dictionary = null;
 let typo_dict = {};
 let words = null;
-
 
 const toTrie = (list) => {
     const trie = { isWord: list.some(e => e.length === 0) };
@@ -32,10 +28,6 @@ const toTrie = (list) => {
     return trie;
 };
 
-
-//console.log(toTrie(['ab', 'aber', 'beo']))
-
-
 const rangeIncl = (S, E) => {
     const result = [];
     for (let i = S; i <= E; i++) {
@@ -43,13 +35,13 @@ const rangeIncl = (S, E) => {
     }
     return result;
 };
-
+const unique = arr => Object.keys(arr.reduce((acc, v) => {
+    acc[v] = 1;
+    return acc;
+}, {}));
 const use = (v, f) => f(v)
-
 const flatMap = (arr, f = e => e) => arr.reduce((acc, x) => acc.concat(f(x)), []);
-
 const equalPos = xy1 => xy2 => xy1.x === xy2.x && xy1.y === xy2.y;
-
 const contains = (positions, xy) => positions.some(equalPos(xy));
 const without = (positions, alreadyContained) =>
     positions.filter(pos => !contains(alreadyContained, pos));
@@ -62,8 +54,6 @@ const neighbors = ({ x, y }, N) =>
         ))
     .filter(e => !(e.x === x && e.y === y));
 
-
-
 const onTrack = (pathLetters, subTrie = words) => {
     if (pathLetters.length === 0)
         return subTrie;
@@ -73,56 +63,49 @@ const onTrack = (pathLetters, subTrie = words) => {
     return false;
 };
 
-fetch(aff)
+setTimeout(() =>
+    fetch(aff)
     .then(json => (json.text().then(
         aff_text => {
             fetch(dic).then(json => (json.text().then(
                 dic_text => {
                     dictionary = new Typo("de_DE", aff_text, dic_text)
-
                     words = toTrie(Object
                         .keys(dictionary.dictionaryTable)
+                        .filter(e => e !== e.toUpperCase())
                         .map(e => e.toLowerCase())
-                        .map(e => e.replace('-', '')));
-
-                    console.log(onTrack(['a', 'b', 'e', 'r', 'g', 'l']))
-
+                        .filter(e => e.indexOf('-') < 0)
+                        .filter(e => e.indexOf('ä') < 0)
+                        .filter(e => e.indexOf('ß') < 0)
+                        .filter(e => e.indexOf('ö') < 0)
+                        .filter(e => e.indexOf('ü') < 0)
+                        .filter(e => e.indexOf('.') < 0)
+                        .filter(e => e.indexOf('�') < 0)
+                    )
                     m.redraw();
                 }
             )))
-        })));
+        }))),
+    200
+);
 
 const xyFromIdx = (idx, N) => { return { x: (idx % N), y: trunc(idx / N) } };
 const idxFromXY = (xy, N) => xy.y * N + xy.x;
-
 const resolve = (dices, path, N) =>
     path.map(p => idxFromXY(p, N)).map(idx => dices[idx]);
 
-
-
-
-
-
 const solve = dices => {
     const N = sqrt(dices.length);
+    console.log(N);
     const solutions = [];
 
-
     const solveRec = (N, path, solutions) => {
-
-        /*
-        
-        if (path.length === N * N)
-            return;
-*/
         let pathWord = resolve(dices.map(e => e.toLowerCase()), path, N);
         let trie = onTrack(pathWord.map(e => e));
-
         if (!trie)
             return;
-
         if (path.length > 2 && trie.isWord) {
-            solutions.push(pathWord)
+            solutions.push(pathWord.join('').toUpperCase())
         }
 
         let myNeighbors = without(neighbors(path[path.length - 1], N), path);
@@ -131,10 +114,7 @@ const solve = dices => {
 
     dices.forEach((dice, idx) => solveRec(N, [xyFromIdx(idx, N)], solutions));
 
-    return Object.keys(solutions.reduce((acc, v) => {
-        acc[v.join('').toUpperCase()] = 1;
-        return acc;
-    }, {}));
+    return unique(solutions);
 };
 
 export default {
