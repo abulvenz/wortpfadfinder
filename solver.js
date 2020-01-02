@@ -75,12 +75,12 @@ setTimeout(() =>
                         .filter(e => e !== e.toUpperCase())
                         .map(e => e.toLowerCase())
                         .filter(e => e.indexOf('-') < 0)
+                        .filter(e => e.indexOf('�') < 0)
                         .filter(e => e.indexOf('ä') < 0)
                         .filter(e => e.indexOf('ß') < 0)
                         .filter(e => e.indexOf('ö') < 0)
                         .filter(e => e.indexOf('ü') < 0)
                         .filter(e => e.indexOf('.') < 0)
-                        .filter(e => e.indexOf('�') < 0)
                     )
                     m.redraw();
                 }
@@ -109,6 +109,11 @@ const solve = dices => {
         }
 
         let myNeighbors = without(neighbors(path[path.length - 1], N), path);
+        /**
+         * To allow path with each dice more than once, 
+         * just exchange comments on previous and next line.
+         */
+        // let myNeighbors = neighbors(path[path.length - 1], N);
         myNeighbors.forEach(neighbor => solveRec(N, [...path, neighbor], solutions))
     };
 
